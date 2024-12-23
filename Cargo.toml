@@ -1,0 +1,16 @@
+[package]
+name = "node-size-analyzer"
+version = "0.1.0"
+edition = "2021"
+description = "CLI tool to analyze node_modules sizes"
+authors = ["Cary Wolff <boss@caryyon.com>"]
+license = "MIT"
+repository = "https://github.com/Caryyon/node-size-analyzer"
+
+[dependencies]
+ratatui = "0.24"
+crossterm = "0.27"
+
+[[bin]]
+name = "node-size"
+path = "src/main.rs"
