@@ -14,5 +14,5 @@ cargo install node-size-analyzer
 
 ```bash
 # cd into a directory with a node_modules folder
-node-size-analyzer
+node-size
 ```
