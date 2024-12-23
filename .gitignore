@@ -1,1 +1,21 @@
-/target
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug files
+*.pdb
+
+# Binary files
+node-size
+node-size.exe
+node-size-*
