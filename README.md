@@ -17,26 +17,36 @@ A fast CLI tool to analyze and visualize the size of your node_modules dependenc
 
 ### Using Cargo
 
+The latest stable version is automatically published to crates.io:
+
 ```bash
 cargo install node-size-analyzer
 ```
 
-### From Releases
+### From GitHub Releases
 
-Download the pre-built binary for your platform from the [releases page](https://github.com/Caryyon/node-size-analyzer/releases).
+Pre-built binaries for all major platforms are automatically generated for each release and available from the [releases page](https://github.com/Caryyon/node-size-analyzer/releases).
 
 #### Linux/MacOS
 
 ```bash
-chmod +x node-size-linux  # or node-size-macos
-./node-size-linux
+# Download the latest release for your platform
+curl -L https://github.com/Caryyon/node-size-analyzer/releases/latest/download/node-size-linux -o node-size
+# or for macOS: 
+# curl -L https://github.com/Caryyon/node-size-analyzer/releases/latest/download/node-size-macos -o node-size
+chmod +x node-size
+./node-size
 ```
 
 #### Windows
 
 ```bash
-node-size-windows.exe
+# Download using PowerShell
+Invoke-WebRequest -Uri https://github.com/Caryyon/node-size-analyzer/releases/latest/download/node-size-windows.exe -OutFile node-size.exe
+.\node-size.exe
 ```
+
+New releases are automatically published when changes are merged to the main branch.
 
 ## Usage
 

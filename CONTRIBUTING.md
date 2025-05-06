@@ -68,13 +68,30 @@ BREAKING CHANGE: The CLI interface has been redesigned with new flag names.
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-When your PR is merged to main, our semantic release process will:
+When your PR is merged to main, our fully automated semantic release process will:
 
 1. Analyze commit messages to determine the next version number
 2. Update the version in Cargo.toml
-3. Create a CHANGELOG.md entry
-4. Create a new GitHub release
-5. Publish to crates.io
+3. Create/update the CHANGELOG.md entry
+4. Create a Git tag for the new version
+5. Create a new GitHub release with binaries for all platforms
+6. Automatically publish to crates.io
+
+The entire process is automated through GitHub Actions workflows:
+
+- **Semantic Release Workflow**: Triggered when code is pushed to main. It analyzes commits, determines the next version, updates files, and creates a tag.
+- **Release Workflow**: Triggered by the new tag. It builds binaries, creates a GitHub release, and publishes to crates.io.
+
+### Publishing to crates.io
+
+Publishing to crates.io is fully automated. The workflow:
+
+1. Verifies the package is publishable with a dry run
+2. Validates that the version in Cargo.toml matches the Git tag
+3. Publishes to crates.io with automatic retries if needed
+4. Verifies the package is available on crates.io
+
+No manual action is required for releases if your commits follow the conventional commit format.
 
 ## Development Setup
 
