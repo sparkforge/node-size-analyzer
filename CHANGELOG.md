@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.4.1...v0.5.0) (2025-05-06)
+
+
+### Features
+
+* add manual crates.io publishing workflow ([aaf8aaf](https://github.com/sparkforge/node-size-analyzer/commit/aaf8aaf8349f2f1b7b1c0dd394d56e7a654f0db2))
+
 ## [0.4.1](https://github.com/sparkforge/node-size-analyzer/compare/v0.4.0...v0.4.1) (2025-05-06)
 
 
