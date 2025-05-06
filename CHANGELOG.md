@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/sparkforge/node-size-analyzer/compare/v0.4.0...v0.4.1) (2025-05-06)
+
+
+### Bug Fixes
+
+* update workflows to use CARGO_REGISTRY_TOKEN ([0941fe0](https://github.com/sparkforge/node-size-analyzer/commit/0941fe05675a1242e44844f5f6b9a4dd3c01ed5a))
+
 # [0.4.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.3.0...v0.4.0) (2025-05-06)
 
 
