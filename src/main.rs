@@ -13,12 +13,12 @@ use crossterm::{
 };
 
 #[derive(Debug)]
-struct ModuleInfo {
-    name: String,
-    size: u64,
+pub struct ModuleInfo {
+    pub name: String,
+    pub size: u64,
 }
 
-fn get_dir_size(path: &Path) -> io::Result<u64> {
+pub fn get_dir_size(path: &Path) -> io::Result<u64> {
     let mut total = 0;
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -32,7 +32,7 @@ fn get_dir_size(path: &Path) -> io::Result<u64> {
     Ok(total)
 }
 
-fn format_size(size: u64) -> String {
+pub fn format_size(size: u64) -> String {
     const KB: u64 = 1024;
     const MB: u64 = KB * 1024;
 
@@ -45,8 +45,11 @@ fn format_size(size: u64) -> String {
     }
 }
 
-fn scan_node_modules() -> io::Result<Vec<ModuleInfo>> {
-    let node_modules = Path::new("node_modules");
+pub fn scan_node_modules() -> io::Result<Vec<ModuleInfo>> {
+    scan_modules_dir(Path::new("node_modules"))
+}
+
+pub fn scan_modules_dir(node_modules: &Path) -> io::Result<Vec<ModuleInfo>> {
     let mut modules = Vec::new();
 
     for entry in fs::read_dir(node_modules)? {
@@ -117,4 +120,90 @@ fn run_app() -> io::Result<()> {
 
 fn main() -> io::Result<()> {
     run_app()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::{self, File};
+    use std::io::Write;
+    use tempfile::tempdir;
+    
+    #[test]
+    fn test_format_size() {
+        assert_eq!(format_size(500), "500 B");
+        assert_eq!(format_size(1024), "1.00 KB");
+        assert_eq!(format_size(1500), "1.46 KB");
+        assert_eq!(format_size(1024 * 1024), "1.00 MB");
+        assert_eq!(format_size(1024 * 1024 * 2 + 1024 * 100), "2.10 MB");
+    }
+    
+    #[test]
+    fn test_get_dir_size() -> io::Result<()> {
+        // Create a temporary directory
+        let temp_dir = tempdir()?;
+        let temp_path = temp_dir.path();
+        
+        // Create a file with known content
+        let file_path = temp_path.join("test_file.txt");
+        let content = "Hello, world!";
+        let mut file = File::create(&file_path)?;
+        file.write_all(content.as_bytes())?;
+        
+        // Create a subdirectory with a file
+        let subdir_path = temp_path.join("subdir");
+        fs::create_dir(&subdir_path)?;
+        let subfile_path = subdir_path.join("subfile.txt");
+        let subcontent = "This is a test file in a subdirectory";
+        let mut subfile = File::create(&subfile_path)?;
+        subfile.write_all(subcontent.as_bytes())?;
+        
+        // Expected size is the sum of both file contents
+        let expected_size = (content.len() + subcontent.len()) as u64;
+        let actual_size = get_dir_size(temp_path)?;
+        
+        assert_eq!(actual_size, expected_size);
+        Ok(())
+    }
+    
+    #[test]
+    fn test_scan_modules_dir() -> io::Result<()> {
+        // Create a mock node_modules directory structure
+        let temp_dir = tempdir()?;
+        let mock_node_modules = temp_dir.path();
+        
+        // Create a few mock modules with different sizes
+        let modules = vec![
+            ("small-module", 100),
+            ("medium-module", 500),
+            ("large-module", 1000)
+        ];
+        
+        for (name, size) in &modules {
+            let module_path = mock_node_modules.join(name);
+            fs::create_dir(&module_path)?;
+            let file_path = module_path.join("index.js");
+            let content = "a".repeat(*size);
+            let mut file = File::create(file_path)?;
+            file.write_all(content.as_bytes())?;
+        }
+        
+        // Scan the mock node_modules directory
+        let result = scan_modules_dir(mock_node_modules)?;
+        
+        // Check that we have all expected modules
+        assert_eq!(result.len(), modules.len());
+        
+        // Check that they're sorted by size (largest first)
+        assert_eq!(result[0].name, "large-module");
+        assert_eq!(result[1].name, "medium-module");
+        assert_eq!(result[2].name, "small-module");
+        
+        // Check actual sizes
+        assert_eq!(result[0].size, 1000);
+        assert_eq!(result[1].size, 500);
+        assert_eq!(result[2].size, 100);
+        
+        Ok(())
+    }
 }

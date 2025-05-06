@@ -19,3 +19,5 @@ Thumbs.db
 node-size
 node-size.exe
 node-size-*
+
+**/.claude/settings.local.json
