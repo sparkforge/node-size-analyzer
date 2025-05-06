@@ -91,13 +91,21 @@ When adding new features, please ensure:
 
 ## Contributing
 
+This project uses [Semantic Versioning](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/).
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Add tests for your changes
 4. Ensure all tests pass (`cargo test`)
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Commit your changes using the conventional commit format:
+   - `feat: add new feature` (triggers minor version bump)
+   - `fix: resolve bug issue` (triggers patch version bump)
+   - `docs: update documentation` (triggers patch version bump)
+   - `feat!: redesign API` (triggers major version bump)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on commit messages and the release process.
 
 ## How It Works
 

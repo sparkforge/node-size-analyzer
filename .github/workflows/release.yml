@@ -23,7 +23,7 @@ jobs:
             asset_name: node-size-macos
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -31,19 +31,25 @@ jobs:
 
       - run: cargo build --release
 
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+        uses: softprops/action-gh-release@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/${{ matrix.artifact_name }}
-          asset_name: ${{ matrix.asset_name }}
-          tag: ${{ github.ref }}
+          files: target/release/${{ matrix.artifact_name }}
+          name: Release v${{ env.VERSION }}
+          body_path: CHANGELOG.md
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   crates:
     name: Publish to crates.io
+    needs: publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
