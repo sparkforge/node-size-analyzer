@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.2.0...v0.3.0) (2025-05-06)
+
+
+### Features
+
+* add scrolling controls for module list ([e928f07](https://github.com/sparkforge/node-size-analyzer/commit/e928f075680ebd7dc75091ca28eb3bdb48fe8197))
+
 # [0.2.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.1.0...v0.2.0) (2025-05-06)
 
 
