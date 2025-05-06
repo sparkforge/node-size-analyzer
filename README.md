@@ -43,7 +43,11 @@ node-size-windows.exe
 1. Navigate to your project directory containing node_modules
 2. Run `node-size`
 3. The terminal UI will display all modules sorted by size
-4. Press 'q' to exit
+4. Use the following key controls:
+   - Press 'q' to exit
+   - Arrow Up/Down or 'k'/'j' to scroll one line
+   - Page Up/Down to scroll a full page
+   - Home/End to jump to beginning/end of the list
 
 ### Example Output
 

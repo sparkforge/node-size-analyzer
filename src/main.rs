@@ -13,7 +13,7 @@ use crossterm::{
 };
 
 #[derive(Debug)]
-pub(crate) struct ModuleInfo {
+pub struct ModuleInfo {
     pub name: String,
     pub size: u64,
 }
@@ -77,6 +77,9 @@ fn run_app() -> io::Result<()> {
 
     let modules = scan_node_modules()?;
     
+    // Scrolling state
+    let mut scroll_offset = 0;
+    
     loop {
         terminal.draw(|f| {
             let size = f.size();
@@ -85,8 +88,21 @@ fn run_app() -> io::Result<()> {
                 .constraints([Constraint::Percentage(100)].as_ref())
                 .split(size);
 
+            // Calculate visible area based on terminal size
+            // Subtract 4 for header row and borders
+            let max_visible_items = (chunks[0].height as usize).saturating_sub(4);
+            
+            // Ensure scroll offset doesn't go beyond available items
+            let total_items = modules.len();
+            if scroll_offset > total_items.saturating_sub(max_visible_items) {
+                scroll_offset = total_items.saturating_sub(max_visible_items);
+            }
+            
+            // Create rows from visible range of modules
             let rows: Vec<Row> = modules
                 .iter()
+                .skip(scroll_offset)
+                .take(max_visible_items)
                 .map(|m| {
                     Row::new(vec![
                         m.name.clone(),
@@ -95,9 +111,21 @@ fn run_app() -> io::Result<()> {
                 })
                 .collect();
 
+            // Create scroll indicator for title
+            let scroll_indicator = if total_items > max_visible_items {
+                format!(" [{}-{}/{}]", 
+                    scroll_offset + 1, 
+                    (scroll_offset + rows.len()).min(total_items),
+                    total_items)
+            } else {
+                String::new()
+            };
+
             let table = Table::new(rows)
                 .header(Row::new(vec!["Module", "Size"]).style(Style::default().fg(Color::Yellow)))
-                .block(Block::default().title("Node Modules Size").borders(Borders::ALL))
+                .block(Block::default()
+                    .title(format!("Node Modules Size{}", scroll_indicator))
+                    .borders(Borders::ALL))
                 .widths(&[
                     Constraint::Percentage(70),
                     Constraint::Percentage(30),
@@ -107,8 +135,35 @@ fn run_app() -> io::Result<()> {
         })?;
 
         if let Event::Key(key) = event::read()? {
-            if key.code == KeyCode::Char('q') {
-                break;
+            match key.code {
+                KeyCode::Char('q') => break,
+                KeyCode::Up | KeyCode::Char('k') => {
+                    if scroll_offset > 0 {
+                        scroll_offset -= 1;
+                    }
+                },
+                KeyCode::Down | KeyCode::Char('j') => {
+                    scroll_offset += 1;
+                },
+                KeyCode::PageUp => {
+                    // Terminal size - 4 (header + borders)
+                    let page_size = terminal.size()?.height as usize - 4;
+                    scroll_offset = scroll_offset.saturating_sub(page_size);
+                },
+                KeyCode::PageDown => {
+                    // Terminal size - 4 (header + borders)
+                    let page_size = terminal.size()?.height as usize - 4;
+                    scroll_offset += page_size;
+                },
+                KeyCode::Home => {
+                    scroll_offset = 0;
+                },
+                KeyCode::End => {
+                    // Go to last page
+                    let max_visible_items = terminal.size()?.height as usize - 4;
+                    scroll_offset = modules.len().saturating_sub(max_visible_items);
+                },
+                _ => {}
             }
         }
     }
