@@ -30,46 +30,16 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Create semantic-release config
-        run: |
-          cat > .releaserc.json << EOF
-          {
-            "branches": ["main"],
-            "plugins": [
-              ["@semantic-release/commit-analyzer", {
-                "preset": "conventionalcommits",
-                "releaseRules": [
-                  {"type": "feat", "release": "minor"},
-                  {"type": "fix", "release": "patch"},
-                  {"type": "docs", "release": "patch"},
-                  {"type": "style", "release": "patch"},
-                  {"type": "refactor", "release": "patch"},
-                  {"type": "perf", "release": "patch"},
-                  {"type": "test", "release": "patch"},
-                  {"type": "build", "release": "patch"},
-                  {"type": "ci", "release": "patch"},
-                  {"type": "chore", "release": "patch"},
-                  {"scope": "breaking", "release": "major"}
-                ]
-              }],
-              "@semantic-release/release-notes-generator",
-              "@semantic-release/changelog",
-              ["@semantic-release/exec", {
-                "prepareCmd": "sed -i 's/^version = \".*\"/version = \"${nextRelease.version}\"/' Cargo.toml"
-              }],
-              ["@semantic-release/git", {
-                "assets": ["Cargo.toml", "CHANGELOG.md"],
-                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-              }],
-              "@semantic-release/github"
-            ]
-          }
-          EOF
+      # We'll use the checked-in .releaserc.json file instead of creating it dynamically
 
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: |
+          # Fix up the .releaserc.json to avoid shell expansion issues
+          sed -i 's/\$\${nextRelease\.version}/\${nextRelease.version}/g' .releaserc.json
+          sed -i 's/\$\${nextRelease\.notes}/\${nextRelease.notes}/g' .releaserc.json
+          npx semantic-release
 
   # This job will be triggered by the tag created by semantic-release
   trigger-release:
