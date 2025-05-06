@@ -66,7 +66,7 @@ jobs:
       - name: Check if package is publishable
         run: cargo publish --dry-run
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           
       - name: Verify version matches tag
         run: |
@@ -86,7 +86,7 @@ jobs:
           command: cargo publish
           on_retry_command: cargo update && sleep 30
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           
       - name: Verify package on crates.io
         run: |
