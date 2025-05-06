@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.3.0...v0.4.0) (2025-05-06)
+
+
+### Features
+
+* enhance crates.io automated publishing ([d755266](https://github.com/sparkforge/node-size-analyzer/commit/d75526682d39ee55874e688f6966e3db99daa326))
+
 # [0.3.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.2.0...v0.3.0) (2025-05-06)
 
 
