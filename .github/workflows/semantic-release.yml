@@ -35,6 +35,7 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
         run: |
           # Fix up the .releaserc.json to avoid shell expansion issues
           sed -i 's/\$\${nextRelease\.version}/\${nextRelease.version}/g' .releaserc.json
