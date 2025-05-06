@@ -1,0 +1,80 @@
+name: Manual Crates.io Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_check:
+        description: 'Skip version check (use when manually updating)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(grep '^version =' Cargo.toml | head -n 1 | cut -d '"' -f 2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Current version is $VERSION"
+      
+      - name: Update crates.io registry
+        run: cargo update
+      
+      - name: Check if package is publishable
+        run: cargo publish --dry-run
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      
+      - name: Check if version exists on crates.io
+        if: ${{ !inputs.version_check }}
+        run: |
+          RESPONSE=$(curl -s https://crates.io/api/v1/crates/node-size-analyzer/${{ env.VERSION }})
+          if echo "$RESPONSE" | grep -q "\"version\":\"${{ env.VERSION }}\""; then
+            echo "Error: Version ${{ env.VERSION }} already exists on crates.io"
+            exit 1
+          else
+            echo "Version ${{ env.VERSION }} is not on crates.io yet. Proceeding with publish."
+          fi
+      
+      - name: Publish to crates.io
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: cargo publish
+          on_retry_command: cargo update && sleep 30
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      
+      - name: Verify package on crates.io
+        run: |
+          echo "Waiting for package to be available on crates.io..."
+          sleep 30
+          MAX_ATTEMPTS=10
+          attempt=1
+          
+          while [ $attempt -le $MAX_ATTEMPTS ]; do
+            echo "Checking attempt $attempt of $MAX_ATTEMPTS..."
+            if curl -s https://crates.io/api/v1/crates/node-size-analyzer/${{ env.VERSION }} | grep -q "\"version\":\"${{ env.VERSION }}\""; then
+              echo "✅ Package node-size-analyzer v${{ env.VERSION }} successfully published to crates.io"
+              exit 0
+            fi
+            
+            echo "Package not found yet, waiting 30 seconds..."
+            sleep 30
+            attempt=$((attempt + 1))
+          done
+          
+          echo "⚠️ Package may still be processing on crates.io. Check manually at https://crates.io/crates/node-size-analyzer"
