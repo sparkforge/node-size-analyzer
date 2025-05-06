@@ -13,7 +13,7 @@ use crossterm::{
 };
 
 #[derive(Debug)]
-pub struct ModuleInfo {
+pub(crate) struct ModuleInfo {
     pub name: String,
     pub size: u64,
 }
