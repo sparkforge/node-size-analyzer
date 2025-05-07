@@ -1,3 +1,10 @@
+## [0.7.1](https://github.com/sparkforge/node-size-analyzer/compare/v0.7.0...v0.7.1) (2025-05-07)
+
+
+### Bug Fixes
+
+* replace cli/setup-gh@v1 with manual GitHub CLI installation ([4a3dbc2](https://github.com/sparkforge/node-size-analyzer/commit/4a3dbc22d6398262acd4a0693beccf0a7849d4dd))
+
 # [0.7.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.6.0...v0.7.0) (2025-05-07)
 
 

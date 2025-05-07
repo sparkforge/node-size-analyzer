@@ -1,6 +1,6 @@
 [package]
 name = "node-size-analyzer"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 description = "CLI tool to analyze node_modules sizes"
 authors = ["Cary Wolff <boss@caryyon.com>"]
