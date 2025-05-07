@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.5.0...v0.6.0) (2025-05-07)
+
+
+### Features
+
+* add force publish workflow and version sync tools ([d1458c5](https://github.com/sparkforge/node-size-analyzer/commit/d1458c570d432d094c49e095ed15ca38c7283914))
+
 # [0.5.0](https://github.com/sparkforge/node-size-analyzer/compare/v0.4.1...v0.5.0) (2025-05-06)
 
 
