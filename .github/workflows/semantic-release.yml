@@ -49,11 +49,37 @@ jobs:
     if: success()
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      
       - name: Sleep for 10 seconds
         run: sleep 10
         shell: bash
-
-      # No action needed here, the release.yml workflow will be triggered automatically 
-      # by the tag created in the semantic-release job
+      
+      - name: Setup GitHub CLI
+        uses: cli/setup-gh@v1
+      
+      - name: Verify release and crates.io sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the current version from Cargo.toml
+          CURRENT_VERSION=$(grep '^version =' Cargo.toml | head -n 1 | cut -d '"' -f 2)
+          echo "Latest version from Cargo.toml: $CURRENT_VERSION"
+          
+          # Check if this version exists on crates.io
+          RESPONSE=$(curl -s https://crates.io/api/v1/crates/node-size-analyzer/$CURRENT_VERSION)
+          
+          if echo "$RESPONSE" | grep -q "\"version\":\"$CURRENT_VERSION\""; then
+            echo "Version $CURRENT_VERSION already exists on crates.io. No additional action needed."
+          else
+            echo "Version $CURRENT_VERSION does not exist on crates.io."
+            echo "Triggering GitHub workflow to publish the new version..."
+            gh workflow run force-publish.yml -f version=$CURRENT_VERSION
+            echo "Workflow triggered. Check GitHub Actions for progress."
+          fi
+      
       - name: Notify completion
         run: echo "Semantic release complete. Release workflow should be triggered automatically."
